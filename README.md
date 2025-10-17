@@ -69,9 +69,7 @@ Con la predicción se comprueba de que es LL(1), en esta no se repiten entre reg
 
 ### Algoritmo:
 
-Para realizar el ascendente se debe tener en cuenta que este se construye de abajo hacia arriba, desde las hojas hasta la raíz (contraria al descendente que es de arriba a abajo).
-
-Para este algoritmo se hacen dos operaciones básicas:
+Para realizar el ascendente se debe tener en cuenta que este se construye de abajo hacia arriba, desde las hojas hasta la raíz (contrario al descendente que es de arriba a abajo). Para este algoritmo se hacen dos operaciones básicas:
 
 SHIFT (Desplazar)
 - Toma el siguiente token de la entrada
@@ -113,7 +111,7 @@ REDUCE (Reducir)
 - Paso 10: Pila=[E] Entrada=[$]
   - -> ACEPTAR
 
-La pregunta principal de este algoritmo es ¿Qué producciones me llevan a E? para ir subiendo hasta llegar al tope. Lo fácil de esta técnica es que no cae en bucles infinitos como en el descendente (E -> E + T e imprime infinitamente E), el ascendente lee primero el token, luego reduce. Nunca cae en bucles porque trabaja con lo que ya tiene.
+La pregunta principal de este algoritmo es ¿Qué producciones me llevan a E? para ir subiendo hasta llegar al tope. Lo fácil de esta técnica es que no cae en bucles infinitos como en el descendente ni necesita una gramática modificada (E -> E + T e imprime infinitamente E), el ascendente lee primero el token, luego reduce. Nunca cae en bucles porque trabaja con lo que ya tiene.
 
 ### Resultados
 
