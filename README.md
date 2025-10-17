@@ -118,3 +118,8 @@ La pregunta principal de este algoritmo es ¿Qué producciones me llevan a E? pa
 ### Resultados
 
 <img width="586" height="172" alt="image" src="https://github.com/user-attachments/assets/66939ad9-9ae9-4baf-92ae-030351141741" />
+
+
+## Punto 4
+
+enfin
