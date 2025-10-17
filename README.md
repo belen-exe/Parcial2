@@ -68,4 +68,48 @@ Conjunto de predicción:
 Con la predicción se comprueba de que es LL(1), en esta no se repiten entre reglas.
 
 ### Algoritmo:
-Para realizar el ascendente se debe tener en cuenta que este se construye de abajo hacia arriba, desde las hojas hasta la raíz (contraria al descendente que es de arriba a abajo) 
+
+Para realizar el ascendente se debe tener en cuenta que este se construye de abajo hacia arriba, desde las hojas hasta la raíz (contraria al descendente que es de arriba a abajo).
+
+Para este algoritmo se hacen dos operaciones básicas:
+
+SHIFT (Desplazar)
+- Toma el siguiente token de la entrada
+- Lo coloca en la pila
+
+REDUCE (Reducir)
+- Busca el extremo derecho de una producción en el tope de la pila
+- Reemplaza esos símbolos por el símbolo del lado izquierdo
+
+**Ejemplo:**
+
+Paso 1: Pila=[] Entrada=[id, +, id, $]
+  -> SHIFT id
+
+Paso 2: Pila=[id] Entrada=[+, id, $]
+  -> REDUCE F->id (porque 'id' está en el tope)
+
+Paso 3: Pila=[F] Entrada=[+, id, $]
+  -> REDUCE T->F (porque 'F' está en el tope)
+
+Paso 4: Pila=[T] Entrada=[+, id, $]
+  -> REDUCE E->T (viene '+' después, es seguro reducir)
+
+Paso 5: Pila=[E] Entrada=[+, id, $]
+  -> SHIFT +
+
+Paso 6: Pila=[E, +] Entrada=[id, $]
+  -> SHIFT id
+
+Paso 7: Pila=[E, +, id] Entrada=[$]
+  -> REDUCE F->id
+
+Paso 8: Pila=[E, +, F] Entrada=[$]
+  -> REDUCE T->F
+
+Paso 9: Pila=[E, +, T] Entrada=[$]
+  -> REDUCE E->E+T (¡encontramos la producción completa!)
+
+Paso 10: Pila=[E] Entrada=[$]
+  -> ACEPTAR
+
