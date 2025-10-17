@@ -19,7 +19,7 @@ F -> ( E )
 F -> id 
 ```
 
-### Transformar:
+### Transformación:
 
 Eliminación de recursión a la izquierda para que sea LL(1): 
 
@@ -108,8 +108,13 @@ Paso 8: Pila=[E, +, F] Entrada=[$]
   -> REDUCE T->F
 
 Paso 9: Pila=[E, +, T] Entrada=[$]
-  -> REDUCE E->E+T (¡encontramos la producción completa!)
+  -> REDUCE E->E+T (se encuentra la reglas original)
 
 Paso 10: Pila=[E] Entrada=[$]
   -> ACEPTAR
 
+La pregunta principal de este algoritmo es ¿Qué producciones me llevan a E? para ir subiendo hasta llegar al tope. Lo fácil de esta técnica es que no cae en bucles infinitos como en el descendente (E -> E + T e imprime infinitamente E), el ascendente lee primero el token, luego reduce. Nunca cae en bucles porque trabaja con lo que ya tiene.
+
+### Resultados
+
+<img width="586" height="172" alt="image" src="https://github.com/user-attachments/assets/66939ad9-9ae9-4baf-92ae-030351141741" />
