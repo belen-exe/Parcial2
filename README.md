@@ -72,12 +72,12 @@ Con la predicción se comprueba de que es LL(1), en esta no se repiten entre reg
 Para realizar el ascendente se debe tener en cuenta que este se construye de abajo hacia arriba, desde las hojas hasta la raíz (contrario al descendente que es de arriba a abajo). Para este algoritmo se hacen dos operaciones básicas:
 
 SHIFT (Desplazar)
-- Toma el siguiente token de la entrada
-- Lo coloca en la pila
+- Toma el siguiente token de la entrada.
+- Lo coloca en la pila.
 
 REDUCE (Reducir)
-- Busca el extremo derecho de una producción en el tope de la pila
-- Reemplaza esos símbolos por el símbolo del lado izquierdo
+- Busca el extremo derecho de una producción en el tope de la pila.
+- Reemplaza esos símbolos por el símbolo del lado izquierdo.
 
 <br>
 
