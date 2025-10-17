@@ -79,6 +79,8 @@ REDUCE (Reducir)
 - Busca el extremo derecho de una producción en el tope de la pila
 - Reemplaza esos símbolos por el símbolo del lado izquierdo
 
+<br>
+
 **Ejemplo:**
 
 - Paso 1: Pila=[] Entrada=[id, +, id, $]
