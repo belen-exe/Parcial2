@@ -83,35 +83,35 @@ REDUCE (Reducir)
 
 **Ejemplo:**
 
-Paso 1: Pila=[] Entrada=[id, +, id, $]
-  -> SHIFT id
+- Paso 1: Pila=[] Entrada=[id, +, id, $]
+  - -> SHIFT id
 
-Paso 2: Pila=[id] Entrada=[+, id, $]
-  -> REDUCE F->id (porque 'id' está en el tope)
+- Paso 2: Pila=[id] Entrada=[+, id, $]
+  -  -> REDUCE F->id (porque 'id' está en el tope)
 
-Paso 3: Pila=[F] Entrada=[+, id, $]
-  -> REDUCE T->F (porque 'F' está en el tope)
+- Paso 3: Pila=[F] Entrada=[+, id, $]
+  - -> REDUCE T->F (porque 'F' está en el tope)
 
-Paso 4: Pila=[T] Entrada=[+, id, $]
-  -> REDUCE E->T (viene '+' después, es seguro reducir)
+- Paso 4: Pila=[T] Entrada=[+, id, $]
+  - -> REDUCE E->T (viene '+' después, es seguro reducir)
 
-Paso 5: Pila=[E] Entrada=[+, id, $]
-  -> SHIFT +
+- Paso 5: Pila=[E] Entrada=[+, id, $]
+  - -> SHIFT +
 
-Paso 6: Pila=[E, +] Entrada=[id, $]
-  -> SHIFT id
+- Paso 6: Pila=[E, +] Entrada=[id, $]
+  - -> SHIFT id
 
-Paso 7: Pila=[E, +, id] Entrada=[$]
-  -> REDUCE F->id
+- Paso 7: Pila=[E, +, id] Entrada=[$]
+  - -> REDUCE F->id
 
-Paso 8: Pila=[E, +, F] Entrada=[$]
-  -> REDUCE T->F
+- Paso 8: Pila=[E, +, F] Entrada=[$]
+  - -> REDUCE T->F
 
-Paso 9: Pila=[E, +, T] Entrada=[$]
-  -> REDUCE E->E+T (se encuentra la reglas original)
+- Paso 9: Pila=[E, +, T] Entrada=[$]
+  - -> REDUCE E->E+T (se encuentra la reglas original)
 
-Paso 10: Pila=[E] Entrada=[$]
-  -> ACEPTAR
+- Paso 10: Pila=[E] Entrada=[$]
+  - -> ACEPTAR
 
 La pregunta principal de este algoritmo es ¿Qué producciones me llevan a E? para ir subiendo hasta llegar al tope. Lo fácil de esta técnica es que no cae en bucles infinitos como en el descendente (E -> E + T e imprime infinitamente E), el ascendente lee primero el token, luego reduce. Nunca cae en bucles porque trabaja con lo que ya tiene.
 
