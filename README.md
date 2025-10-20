@@ -300,6 +300,400 @@ drop sessions where expired = true
 
 ---
 
+## Punto 2
+
+### NQL - Lenguaje CRUD Simplificado
+
+NQL (NoSQL Query Language) es un lenguaje de programación diseñado para realizar operaciones CRUD (Create, Read, Update, Delete) sobre bases de datos de manera simple e intuitiva. 
+
+#### Características
+
+- **Sintaxis Simple**: Inspirada en JSON, fácil de leer y escribir
+- **Operaciones CRUD Completas**: CREATE, READ, UPDATE y DELETE
+- **Filtros**: Soporte para WHERE con operadores lógicos (AND, OR, NOT)
+- **Ordenamiento y Límites**: SORT y LIMIT para consultas optimizadas
+- **Operaciones Aritméticas**: Soporte para cálculos en actualizaciones
+- **Seguridad**: Advertencias para operaciones peligrosas sin filtros
+
+---
+
+#### Estructura del Proyecto
+
+```
+punto2_NQL/
+├── NQL.l           # Analizador léxico (Flex)
+├── NQL.y           # Analizador sintáctico (Bison)
+├── test.nql        # Archivo de pruebas
+└── nql             # Ejecutable compilado
+```
+
+---
+
+#### Compilación
+
+```bash
+bison -d NQL.y
+flex NQL.l
+gcc -o nql NQL.tab.c lex.yy.c -lfl
+./nql test.nql
+```
+---
+
+#### Sintaxis del Lenguaje
+
+#### 1. CREATE - Insertar Registros
+
+**Sintaxis:**
+```nql
+new <tabla> { campo1: valor1, campo2: valor2, ... }
+```
+
+**Ejemplos:**
+```nql
+new users { name: "Juan", age: 30, active: true }
+new products { name: "Laptop", price: 1299.99, stock: 50 }
+new employees { name: "Ana", salary: 5000, department: "IT", manager: null }
+```
+
+**Tipos de datos soportados:**
+- `NUMBER`: Enteros y decimales (30, 1299.99)
+- `STRING`: Cadenas entre comillas ("Juan", 'texto')
+- `BOOLEAN`: true, false
+- `NULL`: null
+- `ARRAY`: [1, 2, 3, "a", "b"]
+
+---
+
+#### 2. READ - Consultar Registros
+
+**Sintaxis básica:**
+```nql
+get <tabla>
+```
+
+**Con filtros WHERE:**
+```nql
+get <tabla> where <condición>
+```
+
+**Con ordenamiento:**
+```nql
+get <tabla> sort <campo> [asc|desc]
+```
+
+**Con límite:**
+```nql
+get <tabla> limit <número>
+```
+
+**Ejemplos:**
+
+```nql
+# Consultar todos los registros
+get users
+
+# Filtro simple
+get users where age > 18
+
+# Múltiples condiciones con AND
+get products where price > 100 & available = true
+
+# Múltiples condiciones con OR
+get employees where department = "IT" | department = "HR"
+
+# Negación con NOT
+get users where ! active = false
+
+# Condiciones complejas con paréntesis
+get products where (price > 500 & price < 1500) | category = "sale"
+
+# Ordenamiento ascendente
+get users where age > 21 sort name asc
+
+# Ordenamiento descendente con límite
+get products sort price desc limit 10
+
+# Combinación completa
+get products where price < 1000 sort price asc limit 5
+
+# Búsqueda con CONTAINS (LIKE)
+get users where name ~ "Juan"
+```
+
+**Operadores de comparación:**
+- `=` : Igual
+- `!=` : Diferente
+- `>` : Mayor que
+- `<` : Menor que
+- `>=` : Mayor o igual
+- `<=` : Menor o igual
+- `~` : Contiene (LIKE en SQL)
+
+**Operadores lógicos:**
+- `&` : AND
+- `|` : OR
+- `!` : NOT
+
+---
+
+#### 3. UPDATE - Actualizar Registros
+
+**Sintaxis:**
+```nql
+set <tabla> { campo1: valor1, campo2: valor2 } [where <condición>]
+```
+
+**⚠️ ADVERTENCIA:** UPDATE sin WHERE actualiza TODOS los registros.
+
+**Ejemplos:**
+
+```nql
+# Actualizar con filtro (recomendado)
+set users { age: 31 } where name = "Juan"
+
+# Actualizar múltiples campos
+set employees { 
+    salary: 6000, 
+    department: "Management",
+    active: true 
+} where name = "Ana"
+
+# Operaciones aritméticas
+set products { price: price + 100 } where category = "electronics"
+set products { stock: stock - 1 } where name = "Laptop"
+set employees { salary: salary * 1.1 } where department = "IT"
+set accounts { balance: balance / 2 } where type = "savings"
+
+# Con múltiples condiciones
+set users { active: false } where age < 18 | verified = false
+
+# Actualizar todo (peligroso)
+set users { active: false }
+```
+
+---
+
+#### 4. DELETE - Eliminar Registros
+
+**Sintaxis:**
+```nql
+drop <tabla> [where <condición>]
+```
+
+**ADVERTENCIA:** DELETE sin WHERE elimina TODOS los registros.
+
+**Ejemplos:**
+
+```nql
+# Eliminar con filtro (recomendado)
+drop users where active = false
+
+# Eliminar con múltiples condiciones
+drop products where stock = 0 & discontinued = true
+
+# Con OR
+drop logs where date < "2023-01-01" | priority = "low"
+
+# Con comparaciones numéricas
+drop sessions where last_access < 30
+
+# Eliminar todo (muy peligroso)
+drop test_table
+```
+
+---
+
+#### Implementación Técnica
+
+#### Arquitectura del Compilador
+
+El compilador de NQL está implementado usando las herramientas clásicas de construcción de compiladores:
+
+1. **Analizador Léxico (NQL.l - Flex)**
+   - Tokeniza la entrada
+   - Reconoce palabras clave, identificadores, números, strings
+   - Maneja comentarios (#, //)
+   - Ignora espacios en blanco
+
+2. **Analizador Sintáctico (NQL.y - Bison)**
+   - Define la gramática del lenguaje
+   - Construye el árbol de sintaxis abstracta
+   - Realiza análisis semántico básico
+   - Genera la salida en formato SQL
+
+#### Componentes Principales
+
+#### 1. Tokens (NQL.l)
+
+```c
+// Palabras clave
+NEW, GET, SET, DROP, WHERE, SORT, LIMIT, ASC, DESC
+
+// Operadores de comparación
+EQ (=), NE (!=), GT (>), LT (<), GE (>=), LE (<=), CONTAINS (~)
+
+// Operadores lógicos
+AND (&), OR (|), NOT (!)
+
+// Operadores aritméticos
+PLUS (+), MINUS (-), MULT (*), DIV (/)
+
+// Delimitadores
+{, }, (, ), [, ], ,, :
+
+// Literales
+IDENTIFIER, NUMBER, STRING, TRUE, FALSE, NULL
+```
+
+#### 2. Gramática (NQL.y)
+
+**Estructura general:**
+```
+programa → sentencias
+sentencias → sentencia | sentencias sentencia
+sentencia → create_op | read_op | update_op | delete_op
+```
+
+**Reglas de producción principales:**
+
+- **CREATE:** `NEW IDENTIFIER { pares }`
+- **READ:** `GET IDENTIFIER [filtro] [opciones]`
+- **UPDATE:** `SET IDENTIFIER { pares } [filtro]`
+- **DELETE:** `DROP IDENTIFIER [filtro]`
+
+**Filtros:**
+```
+filtro → WHERE condicion
+condicion → expresion_comp 
+         | condicion AND condicion
+         | condicion OR condicion
+         | NOT condicion
+         | (condicion)
+```
+
+**Valores y operaciones aritméticas:**
+```
+valor → NUMBER | STRING | TRUE | FALSE | NULL | IDENTIFIER
+     | [array] | valor OPERADOR valor | (valor)
+```
+
+#### 3. Acciones Semánticas
+
+El parser construye representaciones en formato SQL estándar:
+
+- **CREATE** → `INSERT INTO tabla VALUES ...`
+- **READ** → `SELECT * FROM tabla WHERE ...`
+- **UPDATE** → `UPDATE tabla SET ... WHERE ...`
+- **DELETE** → `DELETE FROM tabla WHERE ...`
+
+### Manejo de Memoria
+
+- Uso de `malloc/free` para strings dinámicos
+- `strdup` para copiar cadenas
+- `snprintf` para construcción segura de strings
+- Liberación explícita de memoria después de uso
+
+---
+
+#### Pruebas Realizadas
+
+#### Conjunto de Pruebas Completo (test.nql)
+
+```nql
+
+# --- CREATE ---
+new users { name: "Juan", age: 30, active: true }
+new products { name: "Laptop", price: 1299.99, stock: 50 }
+
+```
+
+<img width="678" height="371" alt="image" src="https://github.com/user-attachments/assets/55b0e3cd-468e-4734-8343-7f99b4c16b2d" />
+
+
+
+```nql
+
+# --- READ ---
+get users
+get users where age > 18
+get products where price < 2000 sort price desc limit 5
+
+```
+
+
+<img width="678" height="343" alt="image" src="https://github.com/user-attachments/assets/fcd05ddc-6a44-4f5a-a68d-4e99da6cd1b8" />
+
+
+```nql
+
+# --- UPDATE ---
+set users { age: 31 } where name = "Juan"
+set products { stock: stock - 1 } where name = "Laptop"
+
+```
+
+<img width="678" height="237" alt="image" src="https://github.com/user-attachments/assets/29e3bbe7-51ab-4d9c-958a-e1a82dfe6f24" />
+
+```nql
+
+# --- DELETE ---
+drop users where active = false
+drop products where stock = 0
+
+```
+
+<img width="678" height="206" alt="image" src="https://github.com/user-attachments/assets/4145a357-d49a-44f8-a0aa-25014d3165e9" />
+
+```nql
+
+# --- OPERACIONES COMPLEJAS ---
+get users where (age > 25 & age < 40) | active = true sort age asc
+set products { price: price * 1.15 } where price > 500
+
+```
+
+<img width="678" height="355" alt="image" src="https://github.com/user-attachments/assets/6fa96265-bfad-4006-84fa-fe71d08509b8" />
+
+
+---
+
+#### Casos de Uso
+
+#### Sistema de Gestión de Usuarios
+```nql
+# Registrar nuevo usuario
+new users { username: "admin", email: "admin@example.com", role: "admin" }
+
+# Buscar usuarios activos
+get users where active = true sort username asc
+
+# Promover usuario a moderador
+set users { role: "moderator" } where username = "john_doe"
+
+# Eliminar usuarios inactivos hace más de 6 meses
+drop users where last_login < 180 & active = false
+```
+
+#### Sistema de Inventario
+```nql
+# Agregar producto
+new inventory { product: "Mouse Gaming", quantity: 100, price: 49.99 }
+
+# Verificar stock bajo
+get inventory where quantity < 20 sort quantity asc
+
+# Actualizar precios con inflación 5%
+set inventory { price: price * 1.05 } where category = "electronics"
+
+# Vender producto (decrementar stock)
+set inventory { quantity: quantity - 1 } where product = "Mouse Gaming"
+
+# Eliminar productos sin stock
+drop inventory where quantity = 0
+```
+
+---
+
 ## Punto 3
 
 Analizador sintáctico ascendente en python.
