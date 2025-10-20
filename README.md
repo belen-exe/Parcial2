@@ -13,7 +13,7 @@
 
 ---
 
-## Gramática Completa
+### Gramática Completa
 
 ```bnf
 # ===== PROGRAMA =====
@@ -111,7 +111,7 @@
 
 ---
 
-## Palabras Reservadas
+### Palabras Reservadas
 
 ```
 new get set drop where sort limit asc desc true false null
@@ -119,9 +119,9 @@ new get set drop where sort limit asc desc true false null
 
 ---
 
-## Operadores
+### Operadores
 
-### Comparación
+#### Comparación
 - `=` : Igual a
 - `!=` : Diferente de
 - `>` : Mayor que
@@ -130,12 +130,12 @@ new get set drop where sort limit asc desc true false null
 - `<=` : Menor o igual que
 - `~` : Contiene (búsqueda de texto)
 
-### Lógicos
+#### Lógicos
 - `&` : AND (y lógico)
 - `|` : OR (o lógico)
 - `!` : NOT (negación)
 
-### Aritméticos
+#### Aritméticos
 - `+` : Suma
 - `-` : Resta
 - `*` : Multiplicación
@@ -143,7 +143,7 @@ new get set drop where sort limit asc desc true false null
 
 ---
 
-## Símbolos Especiales
+### Símbolos Especiales
 
 ```
 {  }  [  ]  (  )  ,  :
@@ -151,7 +151,7 @@ new get set drop where sort limit asc desc true false null
 
 ---
 
-## Precedencia de Operadores
+### Precedencia de Operadores
 
 De mayor a menor precedencia:
 
@@ -165,7 +165,7 @@ De mayor a menor precedencia:
 
 ---
 
-## Asociatividad
+### Asociatividad
 
 - Operadores aritméticos: **Izquierda a derecha**
 - Operadores lógicos: **Izquierda a derecha**
@@ -173,35 +173,35 @@ De mayor a menor precedencia:
 
 ---
 
-## Reglas Semánticas
+### Reglas Semánticas
 
-### 1. Identificadores
+#### 1. Identificadores
 - Deben comenzar con letra o guión bajo
 - Pueden contener letras, dígitos y guiones bajos
 - Son case-sensitive (sensibles a mayúsculas/minúsculas)
 
-### 2. Cadenas
+#### 2. Cadenas
 - Pueden usar comillas dobles `"` o simples `'`
 - No soportan caracteres de escape en esta versión
 
-### 3. Números
+#### 3. Números
 - Pueden ser enteros: `42`, `0`, `999`
 - Pueden ser decimales: `3.14`, `0.5`, `99.99`
 - No soportan notación científica en esta versión
 
-### 4. Arrays
+#### 4. Arrays
 - Pueden contener valores de cualquier tipo
 - Elementos separados por comas
 - Pueden estar vacíos: `[]`
 
-### 5. Comentarios
+#### 5. Comentarios
 - Desde `#` o `//` hasta el fin de línea
 - Son ignorados por el parser
 - No hay comentarios multilínea en esta versión
 
 ---
 
-## Tabla de Tokens
+### Tabla de Tokens
 
 | Token | Tipo | Patrón Léxico | Ejemplo |
 |-------|------|---------------|---------|
@@ -245,9 +245,9 @@ De mayor a menor precedencia:
 
 ---
 
-## Ejemplos Completos de Sentencias Válidas
+### Ejemplos Completos de Sentencias Válidas
 
-```mindb
+```NQL
 # CREATE
 new users { name: "Ana", age: 25, active: true }
 new products { name: "Laptop", price: 999.99, tags: ["tech", "computer"] }
@@ -275,7 +275,7 @@ drop sessions where expired = true
 
 ## Comparación con SQL
 
-| Operación | SQL | MinDB |
+| Operación | SQL | NQL |
 |-----------|-----|-------|
 | INSERT | `INSERT INTO users VALUES (...)` | `new users { ... }` |
 | SELECT ALL | `SELECT * FROM users` | `get users` |
