@@ -443,7 +443,7 @@ get users where name ~ "Juan"
 set <tabla> { campo1: valor1, campo2: valor2 } [where <condición>]
 ```
 
-**⚠️ ADVERTENCIA:** UPDATE sin WHERE actualiza TODOS los registros.
+**ADVERTENCIA:** UPDATE sin WHERE actualiza TODOS los registros.
 
 **Ejemplos:**
 
@@ -607,9 +607,7 @@ new products { name: "Laptop", price: 1299.99, stock: 50 }
 
 ```
 
-<img width="678" height="371" alt="image" src="https://github.com/user-attachments/assets/55b0e3cd-468e-4734-8343-7f99b4c16b2d" />
-
-
+<img width="744" height="464" alt="image" src="https://github.com/user-attachments/assets/30aca31f-93dc-4bf8-a21c-45161dc51e13" />
 
 ```nql
 
@@ -620,9 +618,7 @@ get products where price < 2000 sort price desc limit 5
 
 ```
 
-
 <img width="678" height="343" alt="image" src="https://github.com/user-attachments/assets/fcd05ddc-6a44-4f5a-a68d-4e99da6cd1b8" />
-
 
 ```nql
 
@@ -653,7 +649,6 @@ set products { price: price * 1.15 } where price > 500
 ```
 
 <img width="678" height="355" alt="image" src="https://github.com/user-attachments/assets/6fa96265-bfad-4006-84fa-fe71d08509b8" />
-
 
 ---
 
