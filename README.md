@@ -429,43 +429,6 @@ set products { price: price * 1.15 } where price > 500
 
 ---
 
-#### Casos de Uso
-
-#### Sistema de Gestión de Usuarios
-```nql
-# Registrar nuevo usuario
-new users { username: "admin", email: "admin@example.com", role: "admin" }
-
-# Buscar usuarios activos
-get users where active = true sort username asc
-
-# Promover usuario a moderador
-set users { role: "moderator" } where username = "john_doe"
-
-# Eliminar usuarios inactivos hace más de 6 meses
-drop users where last_login < 180 & active = false
-```
-
-#### Sistema de Inventario
-```nql
-# Agregar producto
-new inventory { product: "Mouse Gaming", quantity: 100, price: 49.99 }
-
-# Verificar stock bajo
-get inventory where quantity < 20 sort quantity asc
-
-# Actualizar precios con inflación 5%
-set inventory { price: price * 1.05 } where category = "electronics"
-
-# Vender producto (decrementar stock)
-set inventory { quantity: quantity - 1 } where product = "Mouse Gaming"
-
-# Eliminar productos sin stock
-drop inventory where quantity = 0
-```
-
----
-
 ## Punto 3
 
 Analizador sintáctico ascendente en python.
