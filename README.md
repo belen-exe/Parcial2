@@ -273,7 +273,7 @@ drop sessions where expired = true
 
 ---
 
-## Comparación con SQL
+### Comparación con SQL
 
 | Operación | SQL | NQL |
 |-----------|-----|-------|
@@ -290,7 +290,7 @@ drop sessions where expired = true
 
 ---
 
-## Notas Adicionales
+### Notas Adicionales
 
 1. **Espacios en blanco**: Pueden aparecer entre cualquier token y son ignorados
 2. **Comentarios**: Pueden aparecer en cualquier lugar y son ignorados
