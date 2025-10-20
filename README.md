@@ -804,7 +804,53 @@ La pregunta principal de este algoritmo es ¿Qué producciones me llevan a E? pa
 
 <img width="586" height="172" alt="image" src="https://github.com/user-attachments/assets/66939ad9-9ae9-4baf-92ae-030351141741" />
 
-
 ## Punto 4
 
-enfin
+Implemente un parser usando el algoritmo CYK. Realice pruebas sobre el rendimiento de este algoritmo comparándolo con un parser de tipo predictivo. Realice una comparación entre el rendimiento de los dos parser.
+
+
+**Analizador predictivo:**
+
+Un analizador predictivo es un **analizador descendente recursivo** sin backtracking ni copia de seguridad. El parser predictivo intenta predecir qué producción usar basándose en el símbolo actual de entrada y el siguiente token (lookahead).
+Construye el árbol de derivación desde la raíz hacia las hojas.
+
+El parser predictivo solo funciona con gramáticas LL(1) (sin recursión izquierda, deterministas).
+
+**Algoritmo CYK:**
+
+El algoritmo CYK (Cocke–Younger–Kasami) intenta reconstruir el árbol de derivación desde las hojas (símbolos terminales) hasta la raíz (símbolo inicial).
+requiere gramáticas en Forma Normal de Chomsky (FNC).
+
+Por tanto no se puede usar literalmente la misma gramática para ambos parsers porque deben tener formas diferentes. Así se usarám gramáticas equivalentes que generen el mismo lenguaje.
+
+
+Para comparar el rendimeinto se usarán diferentes longitudes de cadenas (tokens), y asi verificar que tanto crece el coste de parsing con el tamaño de la entrada.
+
+Complejidad	
+
+CYK	-> O(n³)
+Predictivo (LL(1)) -> O(n)
+
+
+<img width="1216" height="489" alt="image" src="https://github.com/user-attachments/assets/386cc2a7-2f5d-43b0-a7d7-8bb6c81d9fea" />
+
+incluso usando entradas que requieran anifamiento y priofundidad 
+
+    
+     [
+        ("( ( ( id ) ) )", 7),
+        ("( ( ( id + id ) ) )", 9),
+        ("( ( id ) + ( id ) )", 9),
+        ("( ( ( id ) + ( id ) ) * id )", 13),
+    ]
+  
+
+<img width="758" height="486" alt="image" src="https://github.com/user-attachments/assets/32c176f9-eb2c-4e8c-ae75-77e360292ed5" />
+
+
+
+---
+
+## Bibliografía 
+- https://www.geeksforgeeks.org/python/compiler-design-ll1-parser-in-python/
+- https://www.geeksforgeeks.org/compiler-design/cocke-younger-kasami-cyk-algorithm/
