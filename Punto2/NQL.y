@@ -72,8 +72,6 @@ int evaluate_where(Record* r) {
     return 0;
 }
 
-// ---- OPERACIONES ----
-
 void insert_record() {
     Table* t = create_table_if_not_exists(current_table);
     if (!t || t->record_count >= MAX_RECORDS) {
