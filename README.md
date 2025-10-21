@@ -390,35 +390,69 @@ La pregunta principal de este algoritmo es ¿Qué producciones me llevan a E? pa
 
 ## Punto 4
 
-Implemente un parser usando el algoritmo CYK. Realice pruebas sobre el rendimiento de este algoritmo comparándolo con un parser de tipo predictivo. Realice una comparación entre el rendimiento de los dos parser.
+Comparación entre el rendimiento entre el parser del algoritmo CYK y un parser de tipo predictivo.
 
 
 **Analizador predictivo:**
 
-Un analizador predictivo es un **analizador descendente recursivo** sin backtracking ni copia de seguridad. El parser predictivo intenta predecir qué producción usar basándose en el símbolo actual de entrada y el siguiente token (lookahead).
-Construye el árbol de derivación desde la raíz hacia las hojas.
+Un analizador predictivo es un **analizador descendente recursivo** sin backtracking ni copia de seguridad, este intenta predecir qué producción usar basándose en el símbolo actual de entrada y el siguiente token (lookahead), construye el árbol de derivación desde la raíz hacia las hojas.
 
 El parser predictivo solo funciona con gramáticas LL(1) (sin recursión izquierda, deterministas).
+
+    rules = [
+      "E -> T E'",
+      "E' -> + T E' | #",
+      "T -> F T'",
+      "T' -> * F T' | #",
+      "F -> ( E ) | id"
+    ]
+
 
 **Algoritmo CYK:**
 
 El algoritmo CYK (Cocke–Younger–Kasami) intenta reconstruir el árbol de derivación desde las hojas (símbolos terminales) hasta la raíz (símbolo inicial).
 requiere gramáticas en Forma Normal de Chomsky (FNC).
 
-Por tanto no se puede usar literalmente la misma gramática para ambos parsers porque deben tener formas diferentes. Así se usarám gramáticas equivalentes que generen el mismo lenguaje.
+    R = {
+      "ID": [["id"]],
+      "PLUS": [["+"]],
+      "MULT": [["*"]],
+      "LP": [["("]],
+      "RP": [[")"]],
+      
+      # F -> id (expandido: F puede derivar todo lo que ID deriva)
+      "F": [["id"], ["LP", "E3"]],
+      
+      # T -> F (expandido: T puede derivar todo lo que F deriva)
+      "T": [["id"], ["LP", "E3"], ["F", "T1"]],
+      
+      # E -> T (expandido: E puede derivar todo lo que T deriva)
+      "E": [["id"], ["LP", "E3"], ["F", "T1"], ["T", "E1"]],
+      
+      "E3": [["E", "RP"]],
+      "T1": [["MULT", "T2"]],
+      "T2": [["id"], ["LP", "E3"], ["F", "T1"]],
+      "E1": [["PLUS", "E2"]],
+      "E2": [["id"], ["LP", "E3"], ["F", "T1"], ["T", "E1"]],
+    }
+
+Para la comparación no se pueden usar literalmente la misma gramática para ambos parsers porque deben tener formas diferentes. Así se usarám gramáticas equivalentes que generen el mismo lenguaje (expresiones aritméticas básicas)
+
+
+
+
+
 
 
 Para comparar el rendimeinto se usarán diferentes longitudes de cadenas (tokens), y asi verificar que tanto crece el coste de parsing con el tamaño de la entrada.
 
-Complejidad	
-
-CYK	-> O(n³)
-Predictivo (LL(1)) -> O(n)
 
 
 <img width="1216" height="489" alt="image" src="https://github.com/user-attachments/assets/386cc2a7-2f5d-43b0-a7d7-8bb6c81d9fea" />
 
-incluso usando entradas que requieran anifamiento y priofundidad 
+Los resultados coinciden con lo esperado por la compeljidad teórica CYK	-> O(n³) y LL(1) -> O(n), y esto se puede evidenciar cada vez más a medida que el el numero de tokens de entrada aumenta.
+
+incluso usando entradas que requieran anidamiento y priofundidad LL1 sigue siendo más eficiente. 
 
     
      [
@@ -430,6 +464,103 @@ incluso usando entradas que requieran anifamiento y priofundidad
   
 
 <img width="758" height="486" alt="image" src="https://github.com/user-attachments/assets/32c176f9-eb2c-4e8c-ae75-77e360292ed5" />
+
+CYK resulta muy lento para cadenas largas, pero es más general ya que soporta gramáticas más complejas o ambiguas, mientras que el Predictivo es mucho más rápido, pero solo sirve para gramáticas bien estructuradas (LL(1)).
+
+
+## Punto 5
+
+### Implentación algoritmode match.
+
+El algoritmo de matching simula el análisis sintáctico descendente usando una pila para verificar si una cadena de entrada pertenece al lenguaje definido por una gramática LL(1).
+
+Una vez calculados los conjuntos de primeros, siguiente, de predicció y la tabla de parseo lo que queda es comprobar si las cadenas de entrada pertenecen a la gramática, 
+eso se logra gracias al algoritmo del match, el cual usa una pila que almacenaque almacena los símbolos que el parser espera procesar.
+
+Inicialización de la pila: [$, S]
+
+- $ es el marcador de fin de entrada
+
+- E es el símbolo inicial de la gramática
+
+
+La cadena a analizar se representada como una lista de tokens seguida del marcador $.
+
+- Formato: [(, id, ..., tokenN, $]
+
+- Puntero: Mantiene la posición actual en la entrada
+
+- Avance: Se incrementa cada vez que se hace un MATCH exitoso
+
+
+La Tabla de Parseo LL(1) es una matriz bidimensional.
+
+- Filas: No-terminales
+- Columnas: Terminales
+- Contenido: Producciones a aplicar
+
+El algoritmo funciona en un bucle principal que se repite mientras la pila no esté vacía. En cada iteración:
+
+1. Inspecciona el tope de la pila
+2. Lee el símbolo actual de la entrada
+3. Decide qué acción tomar según el tipo de símbolos
+
+
+
+### CASO 1: Aceptación 
+
+Condición: El tope de la pila es $ Y el símbolo actual de la entrada es $
+
+Acción: La cadena es ACEPTADA y el análisis termina 
+
+
+
+### CASO 2: Match de Terminales
+
+Condición: El tope de la pila es un símbolo terminal
+
+**Subcaso Match Exitoso:**
+
+Si el tope coincide con el símbolo actual de la entrada
+Entonces:
+
+- Hacer POP (sacar el terminal de la pila)
+- Avanzar el puntero de entrada
+- Continuar con el siguiente símbolo
+
+
+
+**Subcaso Error de Match:**
+
+Si el tope NO coincide con el símbolo actual
+Entonces:
+
+- RECHAZAR la cadena
+- Terminar el análisis
+
+
+
+### CASO 3: Expansión de No-Terminales 
+Condición: El tope de la pila es un símbolo no-terminal
+Proceso:
+
+Consultar la tabla de parseo: tabla[tope][símbolo_actual]
+Si existe una producción:
+
+- Hacer POP del no-terminal
+- Hacer PUSH de los símbolos del lado derecho de la producción en orden inverso
+- Continuar el análisis
+
+
+**Producción ε (épsilon):**
+
+Si la producción es A → ε, simplemente hacemos POP del no-terminal
+NO insertamos nada en la pila (producción vacía)
+
+
+
+
+<img width="764" height="645" alt="image" src="https://github.com/user-attachments/assets/63997d87-dd68-4634-ba9c-0da614835dcb" />
 
 
 
