@@ -2,18 +2,31 @@
 
 ## Punto 1
 
-### Notación BNF Extendida
+### Operaciones Implementadas
 
-- `|` : alternativa (OR)
-- `[]` : opcional (0 o 1 vez)
-- `{}` : repetición (0 o más veces)
-- `()` : agrupación
-- `<>` : símbolo no terminal
-- `""` : símbolo terminal (literal)
+- CREATE (`new`) - Insertar registros
+- READ (`get`) - Consultar registros
+- UPDATE (`set`) - Actualizar registros
+- DELETE (`drop`) - Eliminar registros
+- WHERE - Filtros condicionales en todas las operaciones
+- Múltiples tablas - Hasta 10 tablas simultáneas
+- Tipos de datos - Números, strings, booleanos, null
+- Persistencia en sesión - Los datos se mantienen durante la ejecución
+
+### Operadores Soportados
+
+| Operador | Descripción | Ejemplo |
+|----------|-------------|---------|
+| `=` | Igual | `age = 25` |
+| `!=` | Diferente | `status != "inactive"` |
+| `>` | Mayor que | `price > 100` |
+| `<` | Menor que | `stock < 10` |
+| `>=` | Mayor o igual | `age >= 18` |
+| `<=` | Menor o igual | `quantity <= 50` |
 
 ---
 
-### Gramática Completa
+### Notación BNF
 
 ```bnf
 # ===== PROGRAMA =====
@@ -25,44 +38,30 @@
               | <update_op>
               | <delete_op>
 
-# ===== OPERACIONES CRUD =====
+# ===== CREATE (INSERT) =====
 
-# CREATE (INSERT)
 <create_op> ::= "new" <identificador> "{" <pares> "}"
 
-# READ (SELECT)
-<read_op> ::= "get" <identificador> [ <filtro> ] [ <opciones> ]
+# ===== READ (SELECT) =====
 
-# UPDATE
-<update_op> ::= "set" <identificador> "{" <pares> "}" [ <filtro> ]
+<read_op> ::= "get" <identificador> [ <opt_where> ]
 
-# DELETE
-<delete_op> ::= "drop" <identificador> [ <filtro> ]
+# ===== UPDATE =====
 
-# ===== FILTROS Y CONDICIONES =====
+<update_op> ::= "set" <identificador> "{" <pares> "}" [ <opt_where> ]
 
-<filtro> ::= "where" <condicion>
+# ===== DELETE =====
 
-<condicion> ::= <expresion_comp>
-              | <condicion> "&" <condicion>      # AND
-              | <condicion> "|" <condicion>      # OR
-              | "!" <condicion>                  # NOT
-              | "(" <condicion> ")"
+<delete_op> ::= "drop" <identificador> [ <opt_where> ]
 
-<expresion_comp> ::= <identificador> <operador> <valor>
+# ===== CLÁUSULA WHERE =====
 
-<operador> ::= "=" | "!=" | ">" | "<" | ">=" | "<=" | "~"
+<opt_where> ::= ε                                          # Vacío (opcional)
+              | "where" <identificador> <operador> <valor>
 
-# ===== OPCIONES DE CONSULTA =====
+<operador> ::= "=" | "!=" | ">" | "<" | ">=" | "<="
 
-<opciones> ::= <opcion> { <opcion> }
-
-<opcion> ::= "sort" <identificador> [ <direccion> ]
-           | "limit" <numero>
-
-<direccion> ::= "asc" | "desc"
-
-# ===== VALORES Y EXPRESIONES =====
+# ===== VALORES =====
 
 <pares> ::= <par> { "," <par> }
 
@@ -72,22 +71,8 @@
           | <cadena>
           | <booleano>
           | <nulo>
-          | <arreglo>
-          | <identificador>                     # Referencia a campo
-          | <valor> <op_aritmetico> <identificador>
-          | "(" <valor> ")"
 
-<op_aritmetico> ::= "+" | "-" | "*" | "/"
-
-<arreglo> ::= "[" [ <lista_valores> ] "]"
-
-<lista_valores> ::= <valor_simple> { "," <valor_simple> }
-
-<valor_simple> ::= <numero> | <cadena> | <booleano> | <identificador>
-
-# ===== ELEMENTOS LÉXICOS =====
-
-<numero> ::= <digito>+ [ "." <digito>+ ]
+<numero> ::= [0-9]+ [ "." [0-9]+ ]
 
 <cadena> ::= '"' <caracter>* '"' | "'" <caracter>* "'"
 
@@ -95,198 +80,30 @@
 
 <nulo> ::= "null"
 
-<identificador> ::= <letra> { <letra> | <digito> | "_" }
-
-<letra> ::= "a" | "b" | ... | "z" | "A" | "B" | ... | "Z" | "_"
-
-<digito> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
-
-<caracter> ::= cualquier carácter Unicode excepto comillas o caracteres de escape
+<identificador> ::= [a-zA-Z_] [a-zA-Z0-9_]*
 
 # ===== COMENTARIOS =====
 
-<comentario> ::= "#" <cualquier_caracter_hasta_fin_de_linea>
-               | "//" <cualquier_caracter_hasta_fin_de_linea>
+<comentario> ::= "#" <resto_de_linea>
+               | "//" <resto_de_linea>
 ```
 
----
-
-### Palabras Reservadas
-
-```
-new get set drop where sort limit asc desc true false null
-```
 
 ---
 
-### Operadores
-
-#### Comparación
-- `=` : Igual a
-- `!=` : Diferente de
-- `>` : Mayor que
-- `<` : Menor que
-- `>=` : Mayor o igual que
-- `<=` : Menor o igual que
-- `~` : Contiene (búsqueda de texto)
-
-#### Lógicos
-- `&` : AND (y lógico)
-- `|` : OR (o lógico)
-- `!` : NOT (negación)
-
-#### Aritméticos
-- `+` : Suma
-- `-` : Resta
-- `*` : Multiplicación
-- `/` : División
-
----
-
-### Símbolos Especiales
-
-```
-{  }  [  ]  (  )  ,  :
-```
-
----
-
-### Precedencia de Operadores
-
-De mayor a menor precedencia:
-
-1. `()` - Paréntesis
-2. `!` - NOT (negación)
-3. `*`, `/` - Multiplicación, división
-4. `+`, `-` - Suma, resta
-5. `=`, `!=`, `>`, `<`, `>=`, `<=`, `~` - Operadores de comparación
-6. `&` - AND
-7. `|` - OR
-
----
-
-### Asociatividad
-
-- Operadores aritméticos: **Izquierda a derecha**
-- Operadores lógicos: **Izquierda a derecha**
-- Operadores de comparación: **No asociativos** (no se pueden encadenar)
-
----
-
-### Reglas Semánticas
-
-#### 1. Identificadores
-- Deben comenzar con letra o guión bajo
-- Pueden contener letras, dígitos y guiones bajos
-- Son case-sensitive (sensibles a mayúsculas/minúsculas)
-
-#### 2. Cadenas
-- Pueden usar comillas dobles `"` o simples `'`
-- No soportan caracteres de escape en esta versión
-
-#### 3. Números
-- Pueden ser enteros: `42`, `0`, `999`
-- Pueden ser decimales: `3.14`, `0.5`, `99.99`
-- No soportan notación científica en esta versión
-
-#### 4. Arrays
-- Pueden contener valores de cualquier tipo
-- Elementos separados por comas
-- Pueden estar vacíos: `[]`
-
-#### 5. Comentarios
-- Desde `#` o `//` hasta el fin de línea
-- Son ignorados por el parser
-- No hay comentarios multilínea en esta versión
-
----
-
-### Tabla de Tokens
-
-| Token | Tipo | Patrón Léxico | Ejemplo |
-|-------|------|---------------|---------|
-| `NEW` | Palabra clave | `new` | `new` |
-| `GET` | Palabra clave | `get` | `get` |
-| `SET` | Palabra clave | `set` | `set` |
-| `DROP` | Palabra clave | `drop` | `drop` |
-| `WHERE` | Palabra clave | `where` | `where` |
-| `SORT` | Palabra clave | `sort` | `sort` |
-| `LIMIT` | Palabra clave | `limit` | `limit` |
-| `ASC` | Palabra clave | `asc` | `asc` |
-| `DESC` | Palabra clave | `desc` | `desc` |
-| `TRUE` | Booleano | `true` | `true` |
-| `FALSE` | Booleano | `false` | `false` |
-| `NULL` | Nulo | `null` | `null` |
-| `IDENTIFIER` | Identificador | `[a-zA-Z_][a-zA-Z0-9_]*` | `users`, `age_2` |
-| `NUMBER` | Número | `[0-9]+(\.[0-9]+)?` | `42`, `3.14` |
-| `STRING` | Cadena | `"[^"]*"` o `'[^']*'` | `"Ana"`, `'texto'` |
-| `EQ` | Operador | `=` | `=` |
-| `NE` | Operador | `!=` | `!=` |
-| `GT` | Operador | `>` | `>` |
-| `LT` | Operador | `<` | `<` |
-| `GE` | Operador | `>=` | `>=` |
-| `LE` | Operador | `<=` | `<=` |
-| `CONTAINS` | Operador | `~` | `~` |
-| `AND` | Lógico | `&` | `&` |
-| `OR` | Lógico | `\|` | `\|` |
-| `NOT` | Lógico | `!` | `!` |
-| `PLUS` | Aritmético | `+` | `+` |
-| `MINUS` | Aritmético | `-` | `-` |
-| `MULT` | Aritmético | `*` | `*` |
-| `DIV` | Aritmético | `/` | `/` |
-| `LBRACE` | Delimitador | `{` | `{` |
-| `RBRACE` | Delimitador | `}` | `}` |
-| `LPAREN` | Delimitador | `(` | `(` |
-| `RPAREN` | Delimitador | `)` | `)` |
-| `LBRACKET` | Delimitador | `[` | `[` |
-| `RBRACKET` | Delimitador | `]` | `]` |
-| `COMMA` | Delimitador | `,` | `,` |
-| `COLON` | Delimitador | `:` | `:` |
-
----
-
-### Ejemplos Completos de Sentencias Válidas
-
-```NQL
-# CREATE
-new users { name: "Ana", age: 25, active: true }
-new products { name: "Laptop", price: 999.99, tags: ["tech", "computer"] }
-
-# READ
-get users
-get users where age > 18
-get users where age >= 21 & active = true
-get products where price < 1000 sort price desc
-get posts where published = true sort views desc limit 10
-get users where (role = "admin" | role = "mod") & active = true
-
-# UPDATE
-set users { age: 26 } where id = 1
-set products { stock: stock - 1 } where id = 42
-set users { last_login: "2025-10-19", login_count: login_count + 1 } where email = "ana@test.com"
-
-# DELETE
-drop users where id = 999
-drop logs where created_at < "2024-01-01" & level = "debug"
-drop sessions where expired = true
-```
-
----
 
 ### Comparación con SQL
 
-| Operación | SQL | NQL |
-|-----------|-----|-------|
-| INSERT | `INSERT INTO users VALUES (...)` | `new users { ... }` |
-| SELECT ALL | `SELECT * FROM users` | `get users` |
-| SELECT WHERE | `SELECT * FROM users WHERE age > 18` | `get users where age > 18` |
-| UPDATE | `UPDATE users SET age = 26 WHERE id = 1` | `set users { age: 26 } where id = 1` |
-| DELETE | `DELETE FROM users WHERE id = 1` | `drop users where id = 1` |
-| ORDER BY | `SELECT * FROM users ORDER BY age DESC` | `get users sort age desc` |
-| LIMIT | `SELECT * FROM users LIMIT 10` | `get users limit 10` |
-| AND | `WHERE age > 18 AND active = true` | `where age > 18 & active = true` |
-| OR | `WHERE role = 'admin' OR role = 'mod'` | `where role = "admin" \| role = "mod"` |
-| LIKE | `WHERE name LIKE '%text%'` | `where name ~ "text"` |
+| Característica | NQL | SQL |
+|----------------|-------|-----|
+| Sintaxis | Minimalista | Completa |
+| CREATE TABLE | Implícito | Explícito |
+| INSERT | `new` | `INSERT INTO` |
+| SELECT | `get` | `SELECT * FROM` |
+| UPDATE | `set` | `UPDATE ... SET` |
+| DELETE | `drop` | `DELETE FROM` |
+| WHERE | Simple | Complejo |
+
 
 ---
 
@@ -305,15 +122,6 @@ drop sessions where expired = true
 ### NQL - Lenguaje CRUD Simplificado
 
 NQL (NoSQL Query Language) es un lenguaje de programación diseñado para realizar operaciones CRUD (Create, Read, Update, Delete) sobre bases de datos de manera simple e intuitiva. 
-
-#### Características
-
-- **Sintaxis Simple**: Inspirada en JSON, fácil de leer y escribir
-- **Operaciones CRUD Completas**: CREATE, READ, UPDATE y DELETE
-- **Filtros**: Soporte para WHERE con operadores lógicos (AND, OR, NOT)
-- **Ordenamiento y Límites**: SORT y LIMIT para consultas optimizadas
-- **Operaciones Aritméticas**: Soporte para cálculos en actualizaciones
-- **Seguridad**: Advertencias para operaciones peligrosas sin filtros
 
 ---
 
@@ -343,33 +151,11 @@ gcc -o nql NQL.tab.c lex.yy.c -lfl
 #### Gramática
 
 **Estructura general:**
+
 ```
 programa → sentencias
 sentencias → sentencia | sentencias sentencia
 sentencia → create_op | read_op | update_op | delete_op
-```
-
-**Reglas de producción principales:**
-
-- **CREATE:** `NEW IDENTIFIER { pares }`
-- **READ:** `GET IDENTIFIER [filtro] [opciones]`
-- **UPDATE:** `SET IDENTIFIER { pares } [filtro]`
-- **DELETE:** `DROP IDENTIFIER [filtro]`
-
-**Filtros:**
-```
-filtro → WHERE condicion
-condicion → expresion_comp 
-         | condicion AND condicion
-         | condicion OR condicion
-         | NOT condicion
-         | (condicion)
-```
-
-**Valores y operaciones aritméticas:**
-```
-valor → NUMBER | STRING | TRUE | FALSE | NULL | IDENTIFIER
-     | [array] | valor OPERADOR valor | (valor)
 ```
 
 #### Pruebas Realizadas
@@ -378,54 +164,112 @@ valor → NUMBER | STRING | TRUE | FALSE | NULL | IDENTIFIER
 
 ```nql
 
-# --- CREATE ---
-new users { name: "Juan", age: 30, active: true }
-new products { name: "Laptop", price: 1299.99, stock: 50 }
+# 1. CREATE - Insertar registros
+
+# Insertar usuarios
+new users { name: "Ana", age: 25, active: true }
+new users { name: "Carlos", age: 30, active: true }
+new users { name: "María", age: 22, active: false }
+new users { name: "Pedro", age: 17, active: true }
+
+# Insertar productos
+new products { name: "Laptop", price: 1200000, stock: 15 }
+new products { name: "Mouse", price: 25000, stock: 50 }
+new products { name: "Teclado", price: 88000, stock: 0 }
 
 ```
 
-<img width="744" height="464" alt="image" src="https://github.com/user-attachments/assets/30aca31f-93dc-4bf8-a21c-45161dc51e13" />
+<img width="655" height="788" alt="image" src="https://github.com/user-attachments/assets/5e858f07-39e0-41fe-a506-1c8dd2dbc1d5" />
+
 
 ```nql
 
-# --- READ ---
+# 2. READ - Consultar registros
+
+# Leer todos los usuarios
 get users
-get users where age > 18
-get products where price < 2000 sort price desc limit 5
+
+# Leer todos los productos
+get products
 
 ```
 
-<img width="678" height="343" alt="image" src="https://github.com/user-attachments/assets/fcd05ddc-6a44-4f5a-a68d-4e99da6cd1b8" />
+<img width="655" height="857" alt="image" src="https://github.com/user-attachments/assets/889a6327-b906-404f-9a7b-fed5749c523f" />
 
 ```nql
 
-# --- UPDATE ---
-set users { age: 31 } where name = "Juan"
-set products { stock: stock - 1 } where name = "Laptop"
+# 3. READ con WHERE - Consultas filtradas
+
+# Usuarios mayores de edad
+get users where age >= 18
+
+# Usuarios activos
+get users where active = true
+
+# Productos sin stock
+get products where stock = 0
+
+# Productos económicos
+get products where price < 100000
 
 ```
 
-<img width="678" height="237" alt="image" src="https://github.com/user-attachments/assets/29e3bbe7-51ab-4d9c-958a-e1a82dfe6f24" />
+<img width="655" height="797" alt="image" src="https://github.com/user-attachments/assets/fbe28383-f4fc-4615-b6d7-475706f37ed7" />
+
+<img width="655" height="518" alt="image" src="https://github.com/user-attachments/assets/8c2439af-bad5-4183-8a8d-d8985b753068" />
+
 
 ```nql
 
-# --- DELETE ---
-drop users where active = false
+# 4. UPDATE - Actualizar registros
+
+# Actualizar edad de Ana
+set users { age: 26 } where name = "Ana"
+
+# Ver cambio
+get users where name = "Ana"
+
+# Actualizar precio del Mouse
+set products { price: 29000 } where name = "Mouse"
+
+# Ver cambio
+get products where name = "Mouse"
+
+# Desactivar usuario específico
+set users { active: false } where name = "Carlos"
+
+# Ver cambio
+get users where name = "Carlos"
+
+# Reabastecer producto
+set products { stock: 25 } where name = "Teclado"
+
+# Ver cambio
+get products where name = "Teclado"
+
+```
+<img width="655" height="862" alt="image" src="https://github.com/user-attachments/assets/f756f0c2-9519-437e-927f-2b85931505a2" />
+
+<img width="655" height="293" alt="image" src="https://github.com/user-attachments/assets/8fb3a99c-48a8-4487-beae-1b9d39205dbf" />
+
+
+```
+# 5. DELETE - Eliminar registros
+
+# Eliminar usuario menor de edad
+drop users where age < 18
+
+# Verificar que se eliminó
+get users
+
+# Eliminar productos sin stock (antes del reabastecimiento habría funcionado)
 drop products where stock = 0
 
+# Ver productos restantes
+get products
 ```
 
-<img width="678" height="206" alt="image" src="https://github.com/user-attachments/assets/4145a357-d49a-44f8-a0aa-25014d3165e9" />
-
-```nql
-
-# --- OPERACIONES COMPLEJAS ---
-get users where (age > 25 & age < 40) | active = true sort age asc
-set products { price: price * 1.15 } where price > 500
-
-```
-
-<img width="678" height="355" alt="image" src="https://github.com/user-attachments/assets/6fa96265-bfad-4006-84fa-fe71d08509b8" />
+<img width="655" height="899" alt="image" src="https://github.com/user-attachments/assets/a176d6df-f906-4816-870e-90fa46bcfba4" />
 
 ---
 
