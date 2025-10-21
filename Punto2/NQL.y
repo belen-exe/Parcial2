@@ -20,8 +20,6 @@ char where_op[10];
 Value where_value;
 int has_where = 0;
 
-// ---- FUNCIONES AUXILIARES ----
-
 Table* find_table(const char* name) {
     for (int i = 0; i < table_count; i++) {
         if (strcmp(tables[i].name, name) == 0) return &tables[i];
