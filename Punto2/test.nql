@@ -1,0 +1,74 @@
+# 1. CREATE - Insertar registros
+
+# Insertar usuarios
+new users { name: "Ana", age: 25, active: true }
+new users { name: "Carlos", age: 30, active: true }
+new users { name: "María", age: 22, active: false }
+new users { name: "Pedro", age: 17, active: true }
+
+# Insertar productos
+new products { name: "Laptop", price: 1200000, stock: 15 }
+new products { name: "Mouse", price: 25000, stock: 50 }
+new products { name: "Teclado", price: 88000, stock: 0 }
+
+# 2. READ - Consultar registros
+
+# Leer todos los usuarios
+get users
+
+# Leer todos los productos
+get products
+
+# 3. READ con WHERE - Consultas filtradas
+
+# Usuarios mayores de edad
+get users where age >= 18
+
+# Usuarios activos
+get users where active = true
+
+# Productos sin stock
+get products where stock = 0
+
+# Productos económicos
+get products where price < 100000
+
+# 4. UPDATE - Actualizar registros
+
+# Actualizar edad de Ana
+set users { age: 26 } where name = "Ana"
+
+# Ver cambio
+get users where name = "Ana"
+
+# Actualizar precio del Mouse
+set products { price: 29000 } where name = "Mouse"
+
+# Ver cambio
+get products where name = "Mouse"
+
+# Desactivar usuario específico
+set users { active: false } where name = "Carlos"
+
+# Ver cambio
+get users where name = "Carlos"
+
+# Reabastecer producto
+set products { stock: 25 } where name = "Teclado"
+
+# Ver cambio
+get products where name = "Teclado"
+
+# 5. DELETE - Eliminar registros
+
+# Eliminar usuario menor de edad
+drop users where age < 18
+
+# Verificar que se eliminó
+get users
+
+# Eliminar productos sin stock (antes del reabastecimiento habría funcionado)
+drop products where stock = 0
+
+# Ver productos restantes
+get products
